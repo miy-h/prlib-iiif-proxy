@@ -1,9 +1,85 @@
 // module to handle IIIF
 
 import * as v from "valibot";
+import { PageInfo } from "./iip.ts";
+
+function manifestUrl(rootUrl: URL, itemId: string) {
+  return new URL(`/manifest/${itemId}`, rootUrl);
+}
+
+function canvasUrl(rootUrl: URL, itemId: string, canvasId: string) {
+  return new URL(`/${itemId}/${canvasId}`, rootUrl);
+}
+
+function annotationPageUrl(rootUrl: URL, itemId: string, canvasId: string) {
+  return new URL(`/${itemId}/${canvasId}/0`, rootUrl);
+}
+
+function annotationUrl(rootUrl: URL, itemId: string, canvasId: string) {
+  return new URL(`/${itemId}/${canvasId}/0/0`, rootUrl);
+}
 
 function iiifImageBaseUrl(rootUrl: URL, identifier: string) {
   return new URL(`/image/${identifier}`, rootUrl);
+}
+
+function iiifImageUrl(
+  rootUrl: URL,
+  identifier: string,
+  region = "full",
+  size = "max",
+  rotation = 0,
+  quality = "default",
+  format = "jpg",
+) {
+  return new URL(
+    `/image${identifier}/${region}/${size}/${rotation.toString()}/${quality}.${format}`,
+    rootUrl,
+  );
+}
+
+/**
+ * Create a manifest compliant with IIIF Presentation API v3
+ */
+export function createManifest(
+  rootUrl: URL,
+  itemId: string,
+  pagesInfo: PageInfo[],
+) {
+  return {
+    "@context": "http://iiif.io/api/presentation/3/context.json",
+    id: manifestUrl(rootUrl, itemId),
+    type: "Manifest",
+    label: {},
+    items: pagesInfo.map((page, index) => ({
+      id: canvasUrl(rootUrl, itemId, index.toString()),
+      type: "Canvas",
+      width: page.width,
+      height: page.height,
+      items: [{
+        id: annotationPageUrl(rootUrl, itemId, index.toString()),
+        type: "AnnotationPage",
+        items: [{
+          id: annotationUrl(rootUrl, itemId, index.toString()),
+          type: "Annotation",
+          motivation: "painting",
+          body: {
+            id: iiifImageUrl(rootUrl, page.identifier),
+            type: "Image",
+            format: "image/jpeg",
+            width: page.width,
+            height: page.height,
+            service: [{
+              id: iiifImageBaseUrl(rootUrl, page.identifier),
+              type: "ImageService3",
+              profile: "level2",
+            }],
+          },
+          target: canvasUrl(rootUrl, itemId, index.toString()),
+        }],
+      }],
+    })),
+  };
 }
 
 const ImageInfoSchema = v.looseObject({
