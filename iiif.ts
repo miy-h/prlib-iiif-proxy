@@ -34,7 +34,7 @@ function iiifImageUrl(
   format = "jpg",
 ) {
   return new URL(
-    `/image${identifier}/${region}/${size}/${rotation.toString()}/${quality}.${format}`,
+    `/image/${identifier}/${region}/${size}/${rotation.toString()}/${quality}.${format}`,
     rootUrl,
   );
 }
