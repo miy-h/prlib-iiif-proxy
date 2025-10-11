@@ -1,6 +1,7 @@
 // module to handle IIIF
 
 import * as v from "valibot";
+import type { Manifest } from "@iiif/presentation-3";
 import { PageInfo } from "./iip.ts";
 
 function manifestUrl(rootUrl: URL, itemId: string) {
@@ -45,37 +46,37 @@ export function createManifest(
   rootUrl: URL,
   itemId: string,
   pagesInfo: PageInfo[],
-) {
+): Manifest {
   return {
     "@context": "http://iiif.io/api/presentation/3/context.json",
-    id: manifestUrl(rootUrl, itemId),
+    id: manifestUrl(rootUrl, itemId).href,
     type: "Manifest",
     label: {},
     items: pagesInfo.map((page, index) => ({
-      id: canvasUrl(rootUrl, itemId, index.toString()),
+      id: canvasUrl(rootUrl, itemId, index.toString()).href,
       type: "Canvas",
       width: page.width,
       height: page.height,
       items: [{
-        id: annotationPageUrl(rootUrl, itemId, index.toString()),
+        id: annotationPageUrl(rootUrl, itemId, index.toString()).href,
         type: "AnnotationPage",
         items: [{
-          id: annotationUrl(rootUrl, itemId, index.toString()),
+          id: annotationUrl(rootUrl, itemId, index.toString()).href,
           type: "Annotation",
           motivation: "painting",
           body: {
-            id: iiifImageUrl(rootUrl, page.identifier),
+            id: iiifImageUrl(rootUrl, page.identifier).href,
             type: "Image",
             format: "image/jpeg",
             width: page.width,
             height: page.height,
             service: [{
-              id: iiifImageBaseUrl(rootUrl, page.identifier),
+              id: iiifImageBaseUrl(rootUrl, page.identifier).href,
               type: "ImageService3",
               profile: "level2",
             }],
           },
-          target: canvasUrl(rootUrl, itemId, index.toString()),
+          target: canvasUrl(rootUrl, itemId, index.toString()).href,
         }],
       }],
     })),
