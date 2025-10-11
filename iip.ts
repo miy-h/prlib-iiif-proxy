@@ -59,7 +59,7 @@ async function fetchManifest(url: string): Promise<IipManifest> {
 function extractTitle(html: string) {
   const match = /<h1 class="page-title">([^<]*)<\/h1>/.exec(html);
   if (!match) {
-    throw new Error();
+    return "";
   }
   return match[1];
 }
