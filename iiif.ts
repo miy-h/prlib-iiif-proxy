@@ -1,8 +1,8 @@
 // module to handle IIIF
 
 import * as v from "valibot";
-import type { Manifest } from "@iiif/presentation-3";
-import { PageInfo } from "./iip.ts";
+import type { Canvas, Manifest } from "@iiif/presentation-3";
+import { MetaData } from "./iip.ts";
 
 function manifestUrl(rootUrl: URL, itemId: string) {
   return new URL(`/manifest/${itemId}`, rootUrl);
@@ -39,24 +39,33 @@ function iiifImageUrl(
   );
 }
 
+function createLabelForCanvas(index: number): Canvas["label"] {
+  return {
+    en: [`page ${(index + 1).toString()}`],
+  };
+}
+
 /**
  * Create a manifest compliant with IIIF Presentation API v3
  */
 export function createManifest(
   rootUrl: URL,
   itemId: string,
-  pagesInfo: PageInfo[],
+  metaData: MetaData,
 ): Manifest {
   return {
     "@context": "http://iiif.io/api/presentation/3/context.json",
     id: manifestUrl(rootUrl, itemId).href,
     type: "Manifest",
-    label: {},
-    items: pagesInfo.map((page, index) => ({
+    label: {
+      none: [metaData.title],
+    },
+    items: metaData.pages.map((page, index) => ({
       id: canvasUrl(rootUrl, itemId, index.toString()).href,
       type: "Canvas",
       width: page.width,
       height: page.height,
+      label: createLabelForCanvas(index),
       items: [{
         id: annotationPageUrl(rootUrl, itemId, index.toString()).href,
         type: "AnnotationPage",

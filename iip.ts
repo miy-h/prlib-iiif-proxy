@@ -17,10 +17,15 @@ const IipManifestSchema = v.object({
 
 type IipManifest = v.InferOutput<typeof IipManifestSchema>;
 
-export interface PageInfo {
+interface PageInfo {
   identifier: string;
   width: number;
   height: number;
+}
+
+export interface MetaData {
+  title: string;
+  pages: PageInfo[];
 }
 
 const originalRegExp =
@@ -51,7 +56,15 @@ async function fetchManifest(url: string): Promise<IipManifest> {
   return v.parse(IipManifestSchema, await response.json());
 }
 
-export async function fetchPages(itemId: string): Promise<PageInfo[]> {
+function extractTitle(html: string) {
+  const match = /<h1 class="page-title">([^<]*)<\/h1>/.exec(html);
+  if (!match) {
+    throw new Error();
+  }
+  return match[1];
+}
+
+export async function fetchMetaData(itemId: string): Promise<MetaData> {
   const response = await fetch(`https://www.prlib.ru/item/${itemId}`);
   if (!response.ok) {
     throw new Error("item not found");
@@ -59,12 +72,16 @@ export async function fetchPages(itemId: string): Promise<PageInfo[]> {
   const html = await response.text();
   const { imageDir, iipManifestUrl } = extractIipMetaDataFromHtml(html);
   const manifest = await fetchManifest(iipManifestUrl);
-  return manifest.pgs.map((p) => {
-    const maxDimension = p.d.at(-1)!;
-    return {
-      identifier: `${imageDir.replace(/^\//, "")}/${p.f}`,
-      height: maxDimension.h,
-      width: maxDimension.w,
-    };
-  });
+  const title = extractTitle(html);
+  return {
+    title,
+    pages: manifest.pgs.map((p) => {
+      const maxDimension = p.d.at(-1)!;
+      return {
+        identifier: `${imageDir.replace(/^\//, "")}/${p.f}`,
+        height: maxDimension.h,
+        width: maxDimension.w,
+      };
+    }),
+  };
 }

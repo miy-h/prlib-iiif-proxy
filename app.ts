@@ -3,7 +3,7 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { proxy } from "hono/proxy";
 import { createManifest, rewriteIiifImageInfo } from "./iiif.ts";
-import { fetchPages } from "./iip.ts";
+import { fetchMetaData } from "./iip.ts";
 
 const app = new Hono();
 
@@ -37,8 +37,8 @@ app.get("/manifest/:id", async (c) => {
   if (host === undefined) {
     throw new HTTPException(400);
   }
-  const pagesInfo = await fetchPages(id);
-  return c.json(createManifest(new URL("/", c.req.url), id, pagesInfo));
+  const metaData = await fetchMetaData(id);
+  return c.json(createManifest(new URL("/", c.req.url), id, metaData));
 });
 
 export default app;
