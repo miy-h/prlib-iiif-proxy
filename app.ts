@@ -3,7 +3,7 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { proxy } from "hono/proxy";
 import { createManifest, rewriteIiifImageInfo } from "./iiif.ts";
-import { fetchMetaData } from "./iip.ts";
+import { fetchMetaData } from "./prlib.ts";
 
 const app = new Hono();
 

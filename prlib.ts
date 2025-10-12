@@ -1,4 +1,4 @@
-// module to handle [The Internet Imaging Protocol](https://iipimage.sourceforge.io/documentation/protocol)
+// module to scrape Presidential Library and handle with [The Internet Imaging Protocol](https://iipimage.sourceforge.io/documentation/protocol)
 
 import * as v from "valibot";
 

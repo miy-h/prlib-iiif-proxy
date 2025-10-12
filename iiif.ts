@@ -2,7 +2,7 @@
 
 import * as v from "valibot";
 import type { Canvas, Manifest } from "@iiif/presentation-3";
-import { MetaData } from "./iip.ts";
+import { MetaData } from "./prlib.ts";
 
 function manifestUrl(rootUrl: URL, itemId: string) {
   return new URL(`/manifest/${itemId}`, rootUrl);
