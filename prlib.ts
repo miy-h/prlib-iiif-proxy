@@ -1,5 +1,6 @@
 // module to scrape Presidential Library and handle with [The Internet Imaging Protocol](https://iipimage.sourceforge.io/documentation/protocol)
 
+import { HTTPException } from "hono/http-exception";
 import * as v from "valibot";
 
 const IipManifestSchema = v.object({
@@ -64,9 +65,15 @@ function extractTitle(html: string) {
 }
 
 export async function fetchMetaData(itemId: string): Promise<MetaData> {
-  const response = await fetch(`https://www.prlib.ru/item/${itemId}`);
+  const pageUrl = `https://www.prlib.ru/item/${itemId}`;
+  const response = await fetch(pageUrl);
+  if (response.status === 404) {
+    throw new HTTPException(404, {
+      message: `item not found: ${pageUrl}`,
+    });
+  }
   if (!response.ok) {
-    throw new Error("item not found");
+    throw new Error();
   }
   const html = await response.text();
   const { imageDir, iipManifestUrl } = extractIipMetaDataFromHtml(html);
