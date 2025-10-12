@@ -10,7 +10,7 @@ app.use("/manifest/*", cors());
 
 function prlibUrl(path: string): string {
   const url = new URL("https://content.prlib.ru/fcgi-bin/iipsrv.fcgi");
-  url.search = `?${new URLSearchParams({ IIIF: path })}`;
+  url.search = new URLSearchParams({ IIIF: path }).toString();
   return url.href;
 }
 
