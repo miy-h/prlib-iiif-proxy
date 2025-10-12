@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { HTTPException } from "hono/http-exception";
 import { proxy } from "hono/proxy";
 import { createManifest, rewriteIiifImageInfo } from "./iiif.ts";
 import { fetchMetaData } from "./prlib.ts";
@@ -33,10 +32,6 @@ app.get("/image/:rest{.+}", async (c) => {
 
 app.get("/manifest/:id", async (c) => {
   const id = c.req.param("id");
-  const host = c.req.header("Host");
-  if (host === undefined) {
-    throw new HTTPException(400);
-  }
   const metaData = await fetchMetaData(id);
   return c.json(createManifest(new URL("/", c.req.url), id, metaData));
 });
