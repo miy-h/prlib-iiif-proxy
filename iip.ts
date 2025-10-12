@@ -28,10 +28,9 @@ export interface MetaData {
   pages: PageInfo[];
 }
 
-const originalRegExp =
-  /\s*:\s*("(?:[^\\"]|\\["\\/bfnrt]|\\u[0-9a-fA-F]{4})*")/.source;
-
 function extractStringPropertyFromJson(html: string, property: string) {
+  const originalRegExp =
+    /\s*:\s*("(?:[^\\"]|\\["\\/bfnrt]|\\u[0-9a-fA-F]{4})*")/.source;
   const match = new RegExp(`"${property}"${originalRegExp}`).exec(html);
   if (!match) {
     throw new Error();
