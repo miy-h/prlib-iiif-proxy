@@ -2,7 +2,7 @@
   "imports": {
     "@iiif/presentation-3": "npm:@iiif/presentation-3@^2.2.3",
     "valibot": "npm:valibot@^1.1.0",
-    "hono": "jsr:@hono/hono@^4.9.10"
+    "hono": "jsr:@hono/hono@^4.10.1"
   },
   "tasks": {
     "start": "deno run --allow-net main.ts"
